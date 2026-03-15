@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irrigation Forecast</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .input-group { 
+            margin: 15px 0; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: bold;
+        }
+        input, select { 
+            width: 100%; 
+            padding: 8px; 
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button { 
+            background: #2E8B57; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { 
+            background: #26734d; 
+        }
+        .forecast-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9f9f9;
+        }
+        .irrigation-needed {
+            border-left: 5px solid #ff6b6b;
+            background: #fff5f5;
+        }
+        .no-irrigation {
+            border-left: 5px solid #51cf66;
+            background: #f8fff9;
+        }
+        .irrigation-amount {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #e03131;
+            margin: 10px 0;
+        }
+        .confidence {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .high-confidence { background: #d3f9d8; color: #2b8a3e; }
+        .medium-confidence { background: #fff3bf; color: #e67700; }
+        .low-confidence { background: #ffe3e3; color: #c92a2a; }
+        .summary-card {
+            background: #e7f5ff;
+            border: 1px solid #4dabf7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .chart-container {
+            margin: 30px 0;
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 Smart Irrigation Forecast</h1>
+        
+        <!-- Input Form -->
+        <div class="input-section">
+            <h2>Location & Parameters</h2>
+            <div class="input-group">
+                <label for="latitude">Latitude:</label>
+                <input type="number" id="latitude" step="0.01" value="9.0" placeholder="e.g., 9.0 for Ethiopia">
+            </div>
+            <div class="input-group">
+                <label for="longitude">Longitude:</label>
+                <input type="number" id="longitude" step="0.01" value="39.7" placeholder="e.g., 39.7 for Ethiopia">
+            </div>
+            <div class="input-group">
+                <label for="forecastDays">Forecast Days:</label>
+                <input type="number" id="forecastDays" value="10" min="1" max="30">
+            </div>
+            <button onclick="generateForecast()">Generate Forecast</button>
+            <button onclick="retrainModels()" style="background: #495057;">Retrain Models</button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" style="display: none; text-align: center; padding: 20px;">
+            <div style="font-size: 1.2em; color: #2E8B57;">🔄 Generating forecast... This may take a minute.</div>
+        </div>
+
+        <!-- Error Display -->
+        <div id="error" style="display: none; background: #ffe3e3; border: 1px solid #ff6b6b; border-radius: 8px; padding: 15px; margin: 20px 0;"></div>
+
+        <!-- Forecast Results -->
+        <div id="results" style="display: none;">
+            <h2>Irrigation Recommendations</h2>
+            
+            <!-- Summary Card -->
+            <div id="summaryCard" class="summary-card"></div>
+
+            <!-- Forecast Days -->
+            <div id="forecastDaysContainer"></div>
+
+            <!-- Charts -->
+            <div class="chart-container">
+                <canvas id="waterChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="irrigationChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentForecastData = null;
+        let waterChart = null;
+        let irrigationChart = null;
+
+        async function generateForecast() {
+            const latitude = document.getElementById('latitude').value;
+            const longitude = document.getElementById('longitude').value;
+            const forecastDays = document.getElementById('forecastDays').value;
+
+            // Show loading, hide previous results and errors
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+
+            try {
+                const response = await fetch('/forecast', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        latitude: parseFloat(latitude),
+                        longitude: parseFloat(longitude),
+                        forecast_days: parseInt(forecastDays)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Forecast generation failed');
+                }
+
+                if (data.success) {
+                    currentForecastData = data;
+                    displayForecast(data);
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('error').innerHTML = `
+                    <strong>Error:</strong> ${error.message}
+                    <br><small>Please check your coordinates and try again.</small>
+                `;
+                document.getElementById('error').style.display = 'block';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function displayForecast(data) {
+            // Display summary
+            const summary = data.summary;
+            document.getElementById('summaryCard').innerHTML = `
+                <h3>📊 Forecast Summary</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <strong>Total Days:</strong> ${summary.total_days}
+                    </div>
+                    <div>
+                        <strong>Irrigation Days:</strong> ${summary.irrigation_days}
+                    </div>
+                    <div>
+                        <strong>Total Water Needed:</strong> ${summary.total_water_mm.toFixed(1)} mm
+                    </div>
+                    <div>
+                        <strong>Avg Confidence:</strong> ${(summary.avg_confidence * 100).toFixed(1)}%
+                    </div>
+                </div>
+            `;
+
+            // Display daily forecast
+            const forecastContainer = document.getElementById('forecastDaysContainer');
+            forecastContainer.innerHTML = '<h3>📅 Daily Recommendations</h3>';
+
+            data.forecast.forEach(day => {
+                const card = document.createElement('div');
+                card.className = `forecast-card ${day.needs_irrigation ? 'irrigation-needed' : 'no-irrigation'}`;
+                
+                const confidenceClass = day.confidence > 0.8 ? 'high-confidence' : 
+                                      day.confidence > 0.6 ? 'medium-confidence' : 'low-confidence';
+                
+                const irrigationDisplay = day.needs_irrigation ? 
+                    `<div class="irrigation-amount">💧 Irrigation Needed: ${day.irrigation_amount_mm.toFixed(1)} mm</div>` :
+                    '<div style="color: #51cf66; font-weight: bold;">✅ No irrigation needed</div>';
+
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: between; align-items: center;">
+                        <h4 style="margin: 0;">${new Date(day.date).toLocaleDateString()}</h4>
+                        <span class="confidence ${confidenceClass}">
+                            ${(day.confidence * 100).toFixed(0)}% confidence
+                        </span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 10px 0;">
+                        <div>🌡️ Temp: ${day.temperature.toFixed(1)}°C</div>
+                        <div>💦 Precip: ${day.precipitation_mm.toFixed(1)} mm</div>
+                        <div>☀️ ET₀: ${day.et0_mm.toFixed(1)} mm</div>
+                    </div>
+                    ${irrigationDisplay}
+                    <div><strong>Recommendation:</strong> ${day.recommendation}</div>
+                `;
+                
+                forecastContainer.appendChild(card);
+            });
+
+            // Create charts
+            createCharts(data.forecast);
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+        }
+
+        function createCharts(forecastData) {
+            const dates = forecastData.map(day => new Date(day.date).toLocaleDateString());
+            const irrigationAmounts = forecastData.map(day => day.irrigation_amount_mm);
+            const precipitation = forecastData.map(day => day.precipitation_mm);
+            const et0 = forecastData.map(day => day.et0_mm);
+            const needsIrrigation = forecastData.map(day => day.needs_irrigation);
+
+            // Destroy existing charts
+            if (waterChart) waterChart.destroy();
+            if (irrigationChart) irrigationChart.destroy();
+
+            // Water Balance Chart
+            const waterCtx = document.getElementById('waterChart').getContext('2d');
+            waterChart = new Chart(waterCtx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Precipitation (mm)',
+                            data: precipitation,
+                            backgroundColor: '#4dabf7',
+                            order: 2
+                        },
+                        {
+                            label: 'ET₀ (mm)',
+                            data: et0,
+                            backgroundColor: '#ffa94d',
+                            order: 2
+                        },
+                        {
+                            label: 'Irrigation Needed',
+                            data: needsIrrigation.map(need => need ? 10 : 0),
+                            type: 'line',
+                            borderColor: '#ff6b6b',
+                            backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 6,
+                            pointBackgroundColor: '#ff6b6b',
+                            fill: true,
+                            order: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Water Balance & Irrigation Needs'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.dataset.label === 'Irrigation Needed') {
+                                        return needsIrrigation[context.dataIndex] ? '🚨 IRRIGATION DAY' : 'No irrigation';
+                                    }
+                                    return `${context.dataset.label}: ${context.raw.toFixed(1)} mm`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Water (mm)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Irrigation Amount Chart
+            const irrigationCtx = document.getElementById('irrigationChart').getContext('2d');
+            irrigationChart = new Chart(irrigationCtx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Recommended Irrigation (mm)',
+                        data: irrigationAmounts,
+                        backgroundColor: irrigationAmounts.map(amount => 
+                            amount > 0 ? '#e03131' : '#51cf66'
+                        ),
+                        borderColor: irrigationAmounts.map(amount => 
+                            amount > 0 ? '#c92a2a' : '#2b8a3e'
+                        ),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Recommended Irrigation Amounts'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const amount = context.raw;
+                                    if (amount > 0) {
+                                        return `💧 Irrigate: ${amount.toFixed(1)} mm`;
+                                    } else {
+                                        return '✅ No irrigation needed';
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Irrigation Amount (mm)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function retrainModels() {
+            const latitude = document.getElementById('latitude').value;
+            const longitude = document.getElementById('longitude').value;
+
+            try {
+                const response = await fetch('/retrain_models', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        latitude: parseFloat(latitude),
+                        longitude: parseFloat(longitude)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Models retrained successfully!');
+                } else {
+                    alert('❌ Model retraining failed: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error retraining models:', error);
+                alert('❌ Error retraining models');
+            }
+        }
+
+        // Load model status on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/model_status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    console.log('Model status:', data);
+                    if (data.models_trained) {
+                        console.log('✅ Models are trained and ready');
+                    } else {
+                        console.log('⚠️ Models are not trained yet');
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking model status:', error);
+            }
+        });
+    </script>
+</body>
+</html>

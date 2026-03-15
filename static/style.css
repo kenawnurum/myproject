@@ -1,0 +1,300 @@
+/* static/style.css */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.nav {
+    background: linear-gradient(135deg, #2E8B57, #3CB371);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 20px;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.nav a:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+}
+
+h1 {
+    color: #2E8B57;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+h2 {
+    color: #2E8B57;
+    border-bottom: 3px solid #2E8B57;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.input-section {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 25px 0;
+    border: 2px solid #e9ecef;
+}
+
+.form-row {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 250px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #2E8B57;
+    box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+button {
+    background: linear-gradient(135deg, #2E8B57, #3CB371);
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 10px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(46, 139, 87, 0.3);
+}
+
+.soil-info, .results-section {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 25px 0;
+    border: 2px solid #e9ecef;
+}
+
+.soil-properties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.soil-property {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 8px;
+    border-left: 4px solid #2E8B57;
+}
+
+.soil-property label {
+    font-weight: 600;
+    color: #495057;
+    margin: 0;
+}
+
+.soil-property span {
+    font-weight: bold;
+    color: #2E8B57;
+    font-size: 16px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+th, td {
+    border: 1px solid #dee2e6;
+    padding: 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+th {
+    background: linear-gradient(135deg, #2E8B57, #3CB371);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+tr:hover {
+    background-color: #e9ecef;
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
+
+.moisture.high { 
+    background: #d4edda; 
+    color: #155724;
+    font-weight: bold;
+}
+.moisture.medium { 
+    background: #fff3cd; 
+    color: #856404;
+    font-weight: bold;
+}
+.moisture.low { 
+    background: #f8d7da; 
+    color: #721c24;
+    font-weight: bold;
+}
+
+.irrigation-amount {
+    font-weight: bold;
+    color: #e03131;
+    font-size: 15px;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin: 20px 0;
+    border: 2px dashed #2E8B57;
+}
+
+.loading p {
+    font-size: 18px;
+    color: #2E8B57;
+    font-weight: 600;
+    margin: 0;
+}
+
+small {
+    color: #6c757d;
+    font-size: 12px;
+    display: block;
+    margin-top: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+        margin: 10px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .form-group {
+        min-width: 100%;
+    }
+    
+    .nav a {
+        display: block;
+        margin: 10px 0;
+    }
+    
+    th, td {
+        padding: 8px;
+        font-size: 12px;
+    }
+    
+    .soil-properties-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Animation for loading */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Success and error states */
+.success-message {
+    background: #d4edda;
+    color: #155724;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #c3e6cb;
+    margin: 15px 0;
+}
+
+.error-message {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    margin: 15px 0;
+}
