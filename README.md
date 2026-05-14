@@ -37,3 +37,87 @@ Long Short-Term Memory (LSTM) Neural Network: A deep learning model, particularl
 Model Persistence and Deployment: The best-performing Random Forest model and its corresponding StandardScaler were saved using pickle. We demonstrated how these saved artifacts could be loaded and used to make predictions on new, unseen data, providing a foundation for potential real-time deployment.
 
 This notebook provides a comprehensive workflow for ET0 prediction, from data acquisition to model deployment, utilizing various machine learning techniques and best practices for MLOps with MLflow.
+# NASA Power Irrigation App
+
+## Project Structure
+
+```text
+.
+├── app.py
+├── config.py
+├── dr_store.py
+├── et_calculator.py
+├── irrigation_predictor.py
+├── nasa_power.py
+├── requirements.txt
+├── soil_properties.py
+├── weather_live.py
+├── static/
+│   └── style.css
+├── templates/
+│   ├── dr_history.html
+│   ├── forecast.html
+│   ├── index.html
+│   └── performance.html
+├── nasa_power_irrigation_app/
+│   └── static/
+│       ├── downloads/
+│       └── performance/
+├── screens/
+│   └── IrrigationScreen.js
+├── smart-irrigation-app/
+│   ├── App.js
+│   ├── app.json
+│   ├── eslint.config.js
+│   ├── expo-env.d.ts
+│   ├── package.json
+│   ├── README.md
+│   ├── tsconfig.json
+│   ├── app/
+│   │   ├── _layout.tsx
+│   │   ├── modal.tsx
+│   │   └── (tabs)/
+│   │       ├── _layout.tsx
+│   │       ├── explore.tsx
+│   │       └── index.tsx
+│   ├── app-example/
+│   ├── assets/
+│   │   └── images/
+│   ├── components/
+│   │   ├── external-link.tsx
+│   │   ├── haptic-tab.tsx
+│   │   ├── hello-wave.tsx
+│   │   ├── parallax-scroll-view.tsx
+│   │   ├── themed-text.tsx
+│   │   ├── themed-view.tsx
+│   │   └── ui/
+│   │       ├── collapsible.tsx
+│   │       ├── icon-symbol.ios.tsx
+│   │       └── icon-symbol.tsx
+│   ├── constants/
+│   │   └── theme.ts
+│   ├── hooks/
+│   │   ├── use-color-scheme.ts
+│   │   ├── use-color-scheme.web.ts
+│   │   └── use-theme-color.ts
+│   ├── screens/
+│   │   └── components/
+│   │       ├── ForcastCard.js
+│   │       └── IrrigationScreen.js
+│   └── scripts/
+│       └── reset-project.js
+└── venv311/
+    ├── Include/
+    ├── Lib/
+    │   └── site-packages/
+    ├── Scripts/
+    └── share/
+
+```
+
+## Short Overview
+
+- Backend: Flask app for irrigation prediction, ET0 estimation, soil properties, and weather integration.
+- Web UI: HTML templates and static assets served by Flask.
+- Mobile UI: Expo / React Native app under `smart-irrigation-app/`.
+- Generated outputs: downloads and performance artifacts under `nasa_power_irrigation_app/static/`.
