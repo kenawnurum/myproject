@@ -1,6 +1,18 @@
 In this notebook, we embarked on a comprehensive journey to predict Evapotranspiration (ET0) using various machine learning techniques based on NASA POWER weather data. Here's a recap of the key steps and achievements:
 
     Data Acquisition and Preprocessing: We successfully fetched daily weather data (including min/max temperature, humidity, solar radiation, wind speed, and rainfall) for a specific location and period using the NASA POWER API. The raw data was then rigorously preprocessed, including handling invalid values and imputing missing data using a smart_fill function. We also calculated the daily mean temperature (tavg_c) and incorporated elevation data.
+    
+Python code
+   ↓
+Creates URL
+   ↓
+Sends HTTP request to NASA server
+   ↓
+NASA processes request
+   ↓
+NASA returns JSON data
+   ↓
+Python reads the JSON
 
     ET0 Calculation: We computed the reference evapotranspiration (ET0_FAO56) using the FAO-56 Penman-Monteith equation, which served as our ground truth for model training.
 
