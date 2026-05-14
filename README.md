@@ -1,4 +1,7 @@
-In this notebook, we embarked on a comprehensive journey to predict Evapotranspiration (ET0) using various machine learning techniques based on NASA POWER weather data. Here's a recap of the key steps and achievements:
+    Data layer: NASA POWER, live weather, soil inputs, storage
+    Domain layer: ET calculation and irrigation prediction
+    Delivery layer: Flask web app and Expo mobile app
+    Presentation layer: HTML templates, CSS, and React Native UI
 
 Data Acquisition and Preprocessing: We successfully fetched daily weather data (including min/max temperature, humidity, solar radiation, wind speed, and rainfall) for a specific location and period using the NASA POWER API. The raw data was then rigorously preprocessed, including handling invalid values and imputing missing data using a smart_fill function. We also calculated the daily mean temperature (tavg_c) and incorporated elevation data.
     
